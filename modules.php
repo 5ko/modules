@@ -23,7 +23,9 @@ $HTMLHeaderFmt['Modules'] = $HTMLFooterFmt['Modules'] = array();
 $PostConfig["$ModuleDir/modules/modules2.php"] = 25;
 $PostConfig["$ModuleDir/modules/modules3.php"] = 125;
 
+
 $list = LoadModuleList($pagename, 0);
+// xmp($list);
 foreach($list as $Module) {
   $f = "$ModuleDir/$Module/$Module.php";
   if(file_exists($f)) {
@@ -40,18 +42,21 @@ function ModuleData($name) {
 
 
 function ModuleSort($a, $b) {
-  return $a['order'] - $b['order'];
+  return $a[0] - $b[0];
 }
 
 function LoadModuleList($pagename, $min) {
   global $Modules, $ModuleDir, $action;
+  foreach($Modules as $k=>$a) {
+    if(is_numeric($a)) $Modules[$k] = array($a);
+  }
   uasort($Modules, 'ModuleSort');
   
   $list = array();
   
   $max = $min+1000;
   foreach($Modules as $Module=>$a) {
-    if($a['order']<$min || $a['order']>=$max) continue;
+    if($a[0]<$min || $a[0]>=$max) continue;
     if(isset($a['action'])  && !MatchNames($action, $a['action'])) continue;
     if(isset($a['pagename'])&& !MatchNames($pagename, $a['pagename'])) continue;
     $list[] = $Module;
@@ -84,6 +89,5 @@ function ModuleHeaderFooter($a, &$fmt) {
     $x = "<link rel=\"stylesheet\" href=\"$ModuleDirUrl/$fname\" />\n";
     $fmt['Modules'][] = $x;
   }
-  
 }
 

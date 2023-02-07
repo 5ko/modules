@@ -13,14 +13,7 @@
   and adds any scripts and styles to the HTML output.
 */
 
-
-
-
-
-
-
-
-$list = LoadModuleList($pagename, 1000);
+$list = LoadModuleList($pagename, 2000);
 foreach($list as $Module) {
   $f = "$ModuleDir/$Module/$Module.php";
   if(file_exists($f)) {
@@ -30,8 +23,6 @@ foreach($list as $Module) {
   }
 }
 
-
-
 foreach($ModuleHeaderFmt as $a) {
   ModuleHeaderFooter($a, $HTMLHeaderFmt);
 }
@@ -39,3 +30,4 @@ foreach($ModuleHeaderFmt as $a) {
 foreach($ModuleFooterFmt as $a) {
   ModuleHeaderFooter($a, $HTMLFooterFmt);
 }
+
