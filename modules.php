@@ -51,6 +51,7 @@ function LoadModuleList($pagename, $min) {
     if(is_numeric($a)) $Modules[$k] = array($a);
   }
   uasort($Modules, 'ModuleSort');
+  @list($g, $n) = preg_split('![/.]!', $pagename);
   
   $list = array();
   
@@ -58,7 +59,8 @@ function LoadModuleList($pagename, $min) {
   foreach($Modules as $Module=>$a) {
     if($a[0]<$min || $a[0]>=$max) continue;
     if(isset($a['action'])  && !MatchNames($action, $a['action'])) continue;
-    if(isset($a['pagename'])&& !MatchNames($pagename, $a['pagename'])) continue;
+    if(isset($a['name'])&& !MatchNames($pagename, $a['name'])) continue;
+    if(isset($a['group'])&& !MatchNames($g, $a['group'])) continue;
     $list[] = $Module;
   }
   return $list;
