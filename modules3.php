@@ -15,7 +15,9 @@
 
 $list = LoadModuleList($pagename, 2000);
 foreach($list as $Module) {
-  $f = "$ModuleDir/$Module/$Module.php";
+  $ModuleDir = "{$PmModules['dir']}/$Module";
+  $ModuleDirUrl = "{$PmModules['dirurl']}/$Module";
+  $f = "$ModuleDir/$Module.php";
   if(file_exists($f)) {
     include_once($f);
     $fn = "{$Module}_loaded";

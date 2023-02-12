@@ -10,24 +10,34 @@
   and lack of warranty.
 */
 
-$RecipeInfo['Modules']['Version'] = '20230131';
+$RecipeInfo['Modules']['Version'] = '20230212';
 
-SDV($ModuleDir, "$FarmD/modules");
-SDV($ModuleDirUrl, preg_replace('#/[^/]*$#', '/modules', $ScriptUrl, 1));
+
+SDVA($PmModules, array(
+  'dir' => dirname(dirname(__file__)),
+  'dirurl' => preg_replace('#/[^/]*$#', '/modules', $ScriptUrl, 1),
+  'ModuleConfPageFmt' => '{$SiteAdminGroup}.ModuleConf',
+));
+
+if($action=='moduleconf') {
+  include_once(dirname(__file__) . '/moduleconf.php');
+}
+
 $ModuleHeaderFmt = $ModuleFooterFmt = array();
 
 # This needs to be injected before local.css (skins.php)
 $HTMLHeaderFmt['Modules'] = $HTMLFooterFmt['Modules'] = array();
 
 
-$PostConfig["$ModuleDir/modules/modules2.php"] = 25;
-$PostConfig["$ModuleDir/modules/modules3.php"] = 125;
+$PostConfig["{$PmModules['dir']}/modules/modules2.php"] = 25;
+$PostConfig["{$PmModules['dir']}/modules/modules3.php"] = 125;
 
 
 $list = LoadModuleList($pagename, 0);
-// xmp($list);
 foreach($list as $Module) {
-  $f = "$ModuleDir/$Module/$Module.php";
+  $ModuleDir = "{$PmModules['dir']}/$Module";
+  $ModuleDirUrl = "{$PmModules['dirurl']}/$Module";
+  $f = "$ModuleDir/$Module.php";
   if(file_exists($f)) {
     include_once($f);
     $fn = "{$Module}_loaded";
@@ -46,7 +56,7 @@ function ModuleSort($a, $b) {
 }
 
 function LoadModuleList($pagename, $min) {
-  global $Modules, $ModuleDir, $action;
+  global $PmModules, $Modules, $action;
   foreach($Modules as $k=>$a) {
     if(is_numeric($a)) $Modules[$k] = array($a);
   }
@@ -67,7 +77,7 @@ function LoadModuleList($pagename, $min) {
 }
 
 function ModuleHeaderFooter($a, &$fmt) {
-  global $ModuleDirUrl;
+  global $PmModules;
   $a = (array)$a;
   $fname = array_shift($a);
   $dataset = '';
@@ -76,20 +86,28 @@ function ModuleHeaderFooter($a, &$fmt) {
     if(is_null($v)||$v===''||!preg_match('/^\\w([\\w-]*\\w)*$/', $k)) continue;
     
     if(is_string($v)) $v = PHSC($v);
-    elseif(is_numeric($v)) {}
+    elseif(is_numeric($v)) {} # leave as is
     elseif(is_array($v)) $v = PHSC(json_encode($a, JSON_INVALID_UTF8_IGNORE | JSON_PRETTY_PRINT 
       | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES, 4096));
     else continue;
     $dataset .= " $k=\"$v\"";
   }
   
-  if(preg_match('/\\.js$/', $fname)) {
-    $x = "<script src=\"$ModuleDirUrl/$fname\" $dataset></script>\n";
-    $fmt['Modules'][] = $x;
+  if(preg_match('!^(\\S*/)[^/\\s]+(\\s+\\S+)!', $fname, $m)) {
+    $fname = preg_replace('/\\s+/', "$0$m[1]", $fname);
   }
-  elseif(preg_match('/\\.css$/', $fname)) {
-    $x = "<link rel=\"stylesheet\" href=\"$ModuleDirUrl/$fname\" />\n";
-    $fmt['Modules'][] = $x;
+  $fnames = preg_split('/\\s+/', $fname, -1, PREG_SPLIT_NO_EMPTY);
+
+  
+  foreach($fnames as $fname) {
+    if(preg_match('/\\.js$/', $fname)) {
+      $x = "<script src=\"$fname\" $dataset></script>\n";
+      $fmt['Modules'][] = $x;
+    }
+    elseif(preg_match('/\\.css$/', $fname)) {
+      $x = "<link rel=\"stylesheet\" href=\"$fname\" />\n";
+      $fmt['Modules'][] = $x;
+    }
   }
 }
 
