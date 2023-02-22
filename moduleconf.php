@@ -9,9 +9,18 @@
   (at your option) any later version. See pmwiki.php for full details
   and lack of warranty.
   
-  This file loads modules after config.php, Group.Page.php and Group.php.
 */
 
 
+SDVA($HandleActions, array(
+  'moduleconf' => 'HandleModuleConf',
+));
 
+function HandleModuleConf($pagename) {
+  global $PmModules;
+  
+  $confpagename = FmtPageName($PmModules['ModuleConfPageFmt'], $pagename);
+  
+  xmp($confpagename);
 
+}

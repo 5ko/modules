@@ -10,13 +10,13 @@
   and lack of warranty.
 */
 
-$RecipeInfo['Modules']['Version'] = '20230212';
-
+$RecipeInfo['Modules']['Version'] = '20230222';
 
 SDVA($PmModules, array(
   'dir' => dirname(dirname(__file__)),
   'dirurl' => preg_replace('#/[^/]*$#', '/modules', $ScriptUrl, 1),
   'ModuleConfPageFmt' => '{$SiteAdminGroup}.ModuleConf',
+  'ServePrefix' => 'PmModulesServeUrl',
 ));
 
 if($action=='moduleconf') {
